@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { MotivosService } from '../../services/motivos.service';
 import { CommonModule } from '@angular/common';
 import { Motivo } from '../../core/motivo.model';
@@ -7,19 +7,20 @@ import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-motivo-list',
   templateUrl: './motivo-list.component.html',
   styleUrl: './motivo-list.component.css',
-  imports: [CommonModule, MatTableModule, MatInputModule, FormsModule, MatButtonModule],
+  imports: [CommonModule, MatTableModule, MatInputModule, MatFormFieldModule, FormsModule, MatButtonModule],
 })
 export class MotivoListComponent implements OnInit {
   motivos: Motivo[] = [];
   motivosFiltered: Motivo[] = [];
   valueToFilter: string = '';
   motivosService = inject(MotivosService);
+  private cdr = inject(ChangeDetectorRef);
   loading: boolean = false;
   errorMessage: string = '';
   columnsToDisplay: string[] = ['motivo', 'tipo', 'descripcion', 'tipo_motivo', 'actions'];
@@ -33,22 +34,25 @@ export class MotivoListComponent implements OnInit {
   loadMotivos() {
     console.log('Cargando motivos...');
     this.loading = true;
+    this.errorMessage = '';
     this.motivosService.getMotivos().subscribe({
       next: (response) => {
         console.log('Respuesta de la API: ', response);
         if (response.success) {
           this.motivos = response.data || [];
-          this.motivosFiltered = [...this.motivos];
+          this.filterMotivos();
         } else {
           console.error('Error al cargar motivos: ', response);
           this.errorMessage = 'Error al cargar los motivos';
         }
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error en la solicitud de motivos: ', err);
         this.errorMessage = 'Error en la solicitud de motivos';
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -61,8 +65,8 @@ export class MotivoListComponent implements OnInit {
       const filterValue = this.valueToFilter.toLowerCase();
       this.motivosFiltered = this.motivos.filter(
         (motivo) =>
-          motivo.motivo.toLowerCase().includes(filterValue) ||
-          motivo.descripcion.toLowerCase().includes(filterValue),
+          (motivo.motivo || '').toLowerCase().includes(filterValue) ||
+          (motivo.descripcion || '').toLowerCase().includes(filterValue),
       );
     }
   }
