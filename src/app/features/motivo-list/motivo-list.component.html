@@ -1,0 +1,65 @@
+<section>
+  <div class="title">
+    <h2>Lista de motivos</h2>
+    <p>Esta es la lista de motivos disponibles.</p>
+  </div>
+  <div class="filterSection">
+    <mat-form-field>
+      <p>Filtrar motivos</p>
+      <input
+        matInput
+        [(ngModel)]="valueToFilter"
+        type="text"
+        (input)="filterMotivos()"
+        placeholder="Buscar por motivo o descripción..."
+      />
+    </mat-form-field>
+    <button matButton="filled" (click)="createMotivo()">Crear Motivo</button>
+  </div>
+  <div class="information" *ngIf="motivosFiltered.length === 0 && !errorMessage">
+    <p>No se encontraron motivos que coincidan con el filtro.</p>
+  </div>
+  <div class="error" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+  <div>
+    <table
+      mat-table
+      [dataSource]="motivosFiltered"
+      class="mat-elevation-z8"
+      *ngIf="!loading && errorMessage === '' && motivosFiltered.length > 0"
+    >
+      <ng-container matColumnDef="motivo">
+        <th mat-header-cell *matHeaderCellDef>Motivo</th>
+        <td mat-cell *matCellDef="let motivo">{{ motivo.motivo }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="descripcion">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let motivo">{{ motivo.descripcion }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let motivo">{{ motivo.tipo }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo_motivo">
+        <th mat-header-cell *matHeaderCellDef>Tipo de motivo</th>
+        <td mat-cell *matCellDef="let motivo">{{ motivo.tipo_motivo }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let motivo">
+          <button matButton="filled" (click)="editMotivo(motivo)">Editar</button>
+          <button matButton="filled" (click)="deleteMotivo(motivo)">Eliminar</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+    <!-- <button (click)="addMotivo()">Agregar motivo</button> -->
+  </div>
+</section>
