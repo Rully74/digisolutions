@@ -3,7 +3,7 @@ import { MotivoListComponent } from './features/motivo-list/motivo-list.componen
 
 export const routes: Routes = [
     {
-        path: 'list',
+        path: '',
         component: MotivoListComponent
     }
 ];
