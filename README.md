@@ -18,3 +18,12 @@ Para instalar las dependencias necesarias ejecutar:
 npm install
 ```
 
+## Decisiones tecnicas
+
+Para el UI se decide trabajar con Angular Material
+
+## Mejoras pendientes
+- Implementar el form de crear
+- Mejorar la UI
+- Manejo de errores
+
