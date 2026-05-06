@@ -3,23 +3,35 @@ import { MotivosService } from '../../services/motivos.service';
 import { CommonModule } from '@angular/common';
 import { Motivo } from '../../core/motivo.model';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 // Angular Material
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MotivoFormDialogComponent, MotivoFormDialogData } from './motivo-form-dialog.component';
 
 @Component({
   selector: 'app-motivo-list',
   templateUrl: './motivo-list.component.html',
   styleUrl: './motivo-list.component.css',
-  imports: [CommonModule, MatTableModule, MatInputModule, MatFormFieldModule, FormsModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatDialogModule,
+    FormsModule,
+    MatButtonModule,
+  ],
 })
 export class MotivoListComponent implements OnInit {
   motivos: Motivo[] = [];
   motivosFiltered: Motivo[] = [];
   valueToFilter: string = '';
   motivosService = inject(MotivosService);
+  private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
   loading: boolean = false;
   errorMessage: string = '';
@@ -71,33 +83,14 @@ export class MotivoListComponent implements OnInit {
     }
   }
 
-  // Metodo para crear un nuevo motivo (a implementar)
+  // Metodo para crear un nuevo motivo
   createMotivo() {
-    console.log('Crear nuevo motivo');
-    // Lógica para crear un nuevo motivo (a implementar)
+    this.openMotivoForm({ mode: 'create' });
   }
 
-  // Metodo editar un motivo (a implementar)
+  // Metodo editar un motivo
   editMotivo(motivo: Motivo) {
-    console.log('Editar motivo: ', motivo);
-    // Lógica para editar el motivo (a implementar)
-    if (motivo.motivo) {
-      this.motivosService.updateMotivo(motivo).subscribe({
-        next: (response) => {
-          console.log('Respuesta de la API al actualizar motivo: ', response);
-          if (response.success) {
-            this.loadMotivos(); // Recargar la lista de motivos después de actualizar
-          } else {
-            console.error('Error al actualizar motivo: ', response);
-            this.errorMessage = 'Error al actualizar el motivo';
-          }
-        },
-        error: (err) => {
-          console.error('Error en la solicitud de actualización de motivo: ', err);
-          this.errorMessage = 'Error en la solicitud de actualización del motivo';
-        },
-      });
-    }
+    this.openMotivoForm({ mode: 'edit', motivo });
   }
 
   // Metodo eliminar un motivo (a implementar)
@@ -128,5 +121,82 @@ export class MotivoListComponent implements OnInit {
         },
       });
     }
+  }
+
+  private openMotivoForm(data: MotivoFormDialogData) {
+    const dialogRef = this.dialog.open(MotivoFormDialogComponent, {
+      data,
+      width: '520px',
+      maxWidth: 'calc(100vw - 32px)',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((motivo) => {
+      if (!motivo) {
+        return;
+      }
+
+      if (data.mode === 'create') {
+        this.saveNewMotivo(motivo);
+      } else {
+        this.saveEditedMotivo(motivo);
+      }
+    });
+  }
+
+  private saveNewMotivo(motivo: Motivo) {
+    this.loading = true;
+    this.errorMessage = '';
+    this.motivosService
+      .createMotivo(motivo)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Respuesta de la API al crear motivo: ', response);
+          if (response.success) {
+            this.loadMotivos();
+          } else {
+            console.error('Error al crear motivo: ', response);
+            this.errorMessage = 'Error al crear el motivo';
+          }
+        },
+        error: (err) => {
+          console.error('Error en la solicitud de creación de motivo: ', err);
+          this.errorMessage = 'Error en la solicitud de creación del motivo';
+        },
+      });
+  }
+
+  private saveEditedMotivo(motivo: Motivo) {
+    this.loading = true;
+    this.errorMessage = '';
+    this.motivosService
+      .updateMotivo(motivo)
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Respuesta de la API al actualizar motivo: ', response);
+          if (response.success) {
+            this.loadMotivos();
+          } else {
+            console.error('Error al actualizar motivo: ', response);
+            this.errorMessage = 'Error al actualizar el motivo';
+          }
+        },
+        error: (err) => {
+          console.error('Error en la solicitud de actualización de motivo: ', err);
+          this.errorMessage = 'Error en la solicitud de actualización del motivo';
+        },
+      });
   }
 }

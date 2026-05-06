@@ -23,7 +23,7 @@ npm install
 Para el UI se decide trabajar con Angular Material
 
 ## Mejoras pendientes
-- Implementar el form de crear
+- Implementar en el form los tipos traidos de la API
 - Mejorar la UI
 - Manejo de errores
 

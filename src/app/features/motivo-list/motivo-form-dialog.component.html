@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar motivo' : 'Nuevo motivo' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="formContent">
+    <mat-form-field appearance="outline">
+      <mat-label>Motivo</mat-label>
+      <input matInput formControlName="motivo" />
+      <mat-error *ngIf="form.controls.motivo.hasError('required')">El motivo es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <input matInput formControlName="tipo" />
+      <mat-error *ngIf="form.controls.tipo.hasError('required')">El tipo es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Descripción</mat-label>
+      <textarea matInput formControlName="descripcion" rows="3"></textarea>
+      <mat-error *ngIf="form.controls.descripcion.hasError('required')">
+        La descripción es obligatoria.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de motivo</mat-label>
+      <input matInput formControlName="tipo_motivo" />
+      <mat-error *ngIf="form.controls.tipo_motivo.hasError('required')">
+        El tipo de motivo es obligatorio.
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close>Cancelar</button>
+    <button matButton="filled" type="submit">Guardar</button>
+  </mat-dialog-actions>
+</form>
