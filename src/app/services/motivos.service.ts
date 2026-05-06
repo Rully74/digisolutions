@@ -63,7 +63,7 @@ export class MotivosService {
       que: 3,
       tope: '',
       cmd: '',
-      codigo: 'M002',
+      codigo: motivo.motivo,
       tipo: '',
       descripcion: '',
       tipo_motivo: '',

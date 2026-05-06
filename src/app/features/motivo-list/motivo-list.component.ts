@@ -105,19 +105,26 @@ export class MotivoListComponent implements OnInit {
     console.log('Eliminar motivo: ', motivo);
     // Lógica para eliminar el motivo
     if (motivo.motivo) {
+      this.loading = true;
+      this.errorMessage = '';
       this.motivosService.deleteMotivo(motivo).subscribe({
         next: (response) => {
           console.log('Respuesta de la API al eliminar motivo: ', response);
           if (response.success) {
-            this.loadMotivos();
+            this.motivos = this.motivos.filter((item) => item.motivo !== motivo.motivo);
+            this.filterMotivos();
           } else {
             console.error('Error al eliminar motivo: ', response);
             this.errorMessage = 'Error al eliminar el motivo';
           }
+          this.loading = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Error en la solicitud de eliminación de motivo: ', err);
           this.errorMessage = 'Error en la solicitud de eliminación del motivo';
+          this.loading = false;
+          this.cdr.markForCheck();
         },
       });
     }
